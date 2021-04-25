@@ -3,4 +3,34 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="site">
+      <UniqueIdentifier>{98f59f8d-a919-4990-b836-7f7f9a995a50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="site\html">
+      <UniqueIdentifier>{5770dd17-0374-420a-beb8-9cd9a313cf73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="site\images">
+      <UniqueIdentifier>{93c9a248-24f9-495b-87d2-4c97b9594687}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="site\scripts">
+      <UniqueIdentifier>{705ff58c-bda7-4b30-a295-9d2b8520874a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="site\styles">
+      <UniqueIdentifier>{ab4a4782-9e84-4534-902d-6b3dc87a4eea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="site\images\a.jpg">
+      <Filter>site\images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="site\html\a.html">
+      <Filter>site\html</Filter>
+    </None>
+    <None Include="site\html\b.html">
+      <Filter>site\html</Filter>
+    </None>
+  </ItemGroup>
 </Project>

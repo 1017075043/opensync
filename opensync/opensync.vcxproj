@@ -35,14 +35,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{13e742b5-cad3-4c64-aed2-f8985b116f71}</ProjectGuid>
+    <ProjectGuid>{bb4ad4b5-9158-4468-9d68-c4cb6d6974ef}</ProjectGuid>
     <Keyword>Linux</Keyword>
     <RootNamespace>opensync</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
-    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+    <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -74,15 +74,8 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <IncludePath>
-    </IncludePath>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalRemoteCopySources>false</LocalRemoteCopySources>
-    <SourcePath>
-    </SourcePath>
-    <IncludePath>D:\file\public_database\boost_1_69_0;D:\file\public_database\c++ 4.8.2;D:\file\public_database\include;D:\file\public_database\x86_64-redhat-linux_4.8.2;D:\file\public_database\x86_64-redhat-linux;D:\file\public_database\log4cplus;D:\file\public_database\log4cpp;D:\file\public_database\openssl</IncludePath>
+    <IncludePath>D:\file\public_database\boost_1_69_0;D:\file\public_database\c++ 4.8.2;D:\file\public_database\include;D:\file\public_database\x86_64-redhat-linux_4.8.2;D:\file\public_database\x86_64-redhat-linux;D:\file\public_database\log4cplus;D:\file\public_database\log4cpp;D:\file\public_database\openssl;D:\file\public_database\crow</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="exception.cpp" />
@@ -98,6 +91,12 @@
     <ClCompile Include="user_group_info.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="opensync_log4cpp.conf" />
+    <None Include="site\opensync_header.html" />
+    <None Include="site\opensync_index.html" />
+    <None Include="site\opensync_login.html" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="exception.h" />
     <ClInclude Include="file_info_databases.h" />
     <ClInclude Include="file_system_listen.h" />
@@ -111,18 +110,6 @@
     <ClInclude Include="system_action.h" />
     <ClInclude Include="user_group_info.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="opensync_log4cpp.conf" />
-  </ItemGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <Link>
-      <LibraryDependencies>
-      </LibraryDependencies>
-      <IgnoreDefaultLibraries>true</IgnoreDefaultLibraries>
-      <AdditionalOptions>-llog4cpp -lboost_date_time -lboost_filesystem -lboost_program_options -lboost_regex -lboost_system -lboost_prg_exec_monitor -lboost_unit_test_framework -lboost_thread -lpthread -lcrypto %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <LibraryDependencies>log4cpp;boost_date_time;boost_filesystem;boost_program_options;boost_regex;boost_system;boost_prg_exec_monitor;boost_unit_test_framework;boost_thread;pthread;crypto</LibraryDependencies>

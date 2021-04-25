@@ -80,6 +80,13 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="site\images\a.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="site\html\a.html" />
+    <None Include="site\html\b.html" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <LibraryDependencies>log4cpp;boost_date_time;boost_filesystem;boost_program_options;boost_regex;boost_system;boost_prg_exec_monitor;boost_unit_test_framework;boost_thread;pthread;crypto</LibraryDependencies>

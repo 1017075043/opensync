@@ -1,115 +1,127 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="exception.cpp">
-      <Filter>system\exception</Filter>
-    </ClCompile>
-    <ClCompile Include="instance_garbo.cpp">
-      <Filter>system\instance_garbo</Filter>
-    </ClCompile>
-    <ClCompile Include="log4cpp_instance.cpp">
-      <Filter>system\log4cpp_instance</Filter>
-    </ClCompile>
-    <ClCompile Include="string_operation.cpp">
-      <Filter>system\string_operation</Filter>
-    </ClCompile>
-    <ClCompile Include="file_info_databases.cpp">
-      <Filter>public\file_info_databases</Filter>
-    </ClCompile>
-    <ClCompile Include="file_system_listen.cpp">
-      <Filter>public\file_system_listen</Filter>
-    </ClCompile>
-    <ClCompile Include="file_system_operation.cpp">
-      <Filter>public\file_system_operation</Filter>
-    </ClCompile>
-    <ClCompile Include="process_hidden.cpp">
-      <Filter>public\user_group_info</Filter>
-    </ClCompile>
-    <ClCompile Include="system_action.cpp">
-      <Filter>public\system_action</Filter>
-    </ClCompile>
-    <ClCompile Include="user_group_info.cpp">
-      <Filter>public\process_hidden</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="public">
-      <UniqueIdentifier>{9ab38cfd-6a2f-4986-ba13-4653e1876e26}</UniqueIdentifier>
+      <UniqueIdentifier>{57205448-fe08-4745-98c2-486e168fd045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\exception">
+      <UniqueIdentifier>{80b47c29-0ffe-4c4f-9744-d3b63474e83b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\instance_garbo">
+      <UniqueIdentifier>{adc150d9-e001-4dad-b358-e577afe1bbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\log4cpp_instance">
+      <UniqueIdentifier>{91a35e9f-e5d7-4c62-b931-a746a67e82c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public\string_operation">
+      <UniqueIdentifier>{de35c4f6-efd3-499e-83f0-30633a53d6d7}</UniqueIdentifier>
     </Filter>
     <Filter Include="system">
-      <UniqueIdentifier>{3d5685ce-79d3-4ea9-bc0a-3c9df0e8a35e}</UniqueIdentifier>
+      <UniqueIdentifier>{080d75a2-626c-47e7-b0ba-a74034f43c9d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="system\exception">
-      <UniqueIdentifier>{468bc021-76d9-468c-8cfd-518f262271bd}</UniqueIdentifier>
+    <Filter Include="system\file_info_databases">
+      <UniqueIdentifier>{b1a42000-d56a-492e-82b7-6d4b1622e975}</UniqueIdentifier>
     </Filter>
-    <Filter Include="system\instance_garbo">
-      <UniqueIdentifier>{ea1dc79b-7c87-44ea-911e-b0d847b45f4b}</UniqueIdentifier>
+    <Filter Include="system\file_system_listen">
+      <UniqueIdentifier>{a7a2acb9-0f41-42a7-a1b3-d801b584ad37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="system\log4cpp_instance">
-      <UniqueIdentifier>{fdb9b8bb-2a9a-4d46-b828-7419bc743286}</UniqueIdentifier>
+    <Filter Include="system\file_system_operation">
+      <UniqueIdentifier>{6dc9b8a5-6aaa-45c9-bc7a-d9eb9aa53164}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\file_info_databases">
-      <UniqueIdentifier>{e6d36378-96b0-4438-8728-ea22630937e0}</UniqueIdentifier>
+    <Filter Include="system\process_hidden">
+      <UniqueIdentifier>{0056c972-e529-4e3b-a0db-c5e8d8eefca0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\file_system_listen">
-      <UniqueIdentifier>{79a30c05-ea3b-4a7c-a66d-0f071e6138a8}</UniqueIdentifier>
+    <Filter Include="system\system_action">
+      <UniqueIdentifier>{2de4facd-c6cd-4ee9-84ac-48e4e8575ad4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\file_system_operation">
-      <UniqueIdentifier>{1abafa80-578d-4355-9544-cc450479e7a3}</UniqueIdentifier>
+    <Filter Include="system\user_group_info">
+      <UniqueIdentifier>{d671b7b5-8bbe-4847-92ce-5613983b643e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\process_hidden">
-      <UniqueIdentifier>{9a7f22d4-53ac-40bf-a00e-56882342e4ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="public\system_action">
-      <UniqueIdentifier>{e0b94c79-173e-4fa6-ad06-d9c40b5ae4e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="public\user_group_info">
-      <UniqueIdentifier>{a7411f0a-83d8-4964-b869-ef3620cdb3fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="system\string_operation">
-      <UniqueIdentifier>{810533c8-96d4-426b-aed5-a85dddd4b4e8}</UniqueIdentifier>
+    <Filter Include="site">
+      <UniqueIdentifier>{fa9a0812-adcd-4573-b113-38cbcc2fc0d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="exception.h">
-      <Filter>system\exception</Filter>
-    </ClInclude>
-    <ClInclude Include="instance_garbo.h">
-      <Filter>system\instance_garbo</Filter>
-    </ClInclude>
-    <ClInclude Include="log4cpp_instance.h">
-      <Filter>system\log4cpp_instance</Filter>
-    </ClInclude>
-    <ClInclude Include="string_operation.h">
-      <Filter>system\string_operation</Filter>
-    </ClInclude>
-    <ClInclude Include="file_info_databases.h">
-      <Filter>public\file_info_databases</Filter>
-    </ClInclude>
-    <ClInclude Include="file_system_listen.h">
-      <Filter>public\file_system_listen</Filter>
-    </ClInclude>
-    <ClInclude Include="file_system_operation.h">
-      <Filter>public\file_system_operation</Filter>
-    </ClInclude>
-    <ClInclude Include="process_hidden.h">
-      <Filter>public\user_group_info</Filter>
-    </ClInclude>
-    <ClInclude Include="system_action.h">
-      <Filter>public\system_action</Filter>
-    </ClInclude>
-    <ClInclude Include="user_group_info.h">
-      <Filter>public\process_hidden</Filter>
-    </ClInclude>
     <ClInclude Include="opensync_public_define.h">
-      <Filter>system</Filter>
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="opensync_public_include_file.h">
-      <Filter>system</Filter>
+      <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="exception.h">
+      <Filter>public\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="instance_garbo.h">
+      <Filter>public\instance_garbo</Filter>
+    </ClInclude>
+    <ClInclude Include="log4cpp_instance.h">
+      <Filter>public\log4cpp_instance</Filter>
+    </ClInclude>
+    <ClInclude Include="string_operation.h">
+      <Filter>public\string_operation</Filter>
+    </ClInclude>
+    <ClInclude Include="file_info_databases.h">
+      <Filter>system\file_info_databases</Filter>
+    </ClInclude>
+    <ClInclude Include="file_system_listen.h">
+      <Filter>system\file_system_listen</Filter>
+    </ClInclude>
+    <ClInclude Include="file_system_operation.h">
+      <Filter>system\file_system_operation</Filter>
+    </ClInclude>
+    <ClInclude Include="user_group_info.h">
+      <Filter>system\user_group_info</Filter>
+    </ClInclude>
+    <ClInclude Include="system_action.h">
+      <Filter>system\system_action</Filter>
+    </ClInclude>
+    <ClInclude Include="process_hidden.h">
+      <Filter>system\process_hidden</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="exception.cpp">
+      <Filter>public\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="instance_garbo.cpp">
+      <Filter>public\instance_garbo</Filter>
+    </ClCompile>
+    <ClCompile Include="log4cpp_instance.cpp">
+      <Filter>public\log4cpp_instance</Filter>
+    </ClCompile>
+    <ClCompile Include="string_operation.cpp">
+      <Filter>public\string_operation</Filter>
+    </ClCompile>
+    <ClCompile Include="file_info_databases.cpp">
+      <Filter>system\file_info_databases</Filter>
+    </ClCompile>
+    <ClCompile Include="file_system_listen.cpp">
+      <Filter>system\file_system_listen</Filter>
+    </ClCompile>
+    <ClCompile Include="file_system_operation.cpp">
+      <Filter>system\file_system_operation</Filter>
+    </ClCompile>
+    <ClCompile Include="user_group_info.cpp">
+      <Filter>system\user_group_info</Filter>
+    </ClCompile>
+    <ClCompile Include="system_action.cpp">
+      <Filter>system\system_action</Filter>
+    </ClCompile>
+    <ClCompile Include="process_hidden.cpp">
+      <Filter>system\process_hidden</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="opensync_log4cpp.conf" />
+    <None Include="site\opensync_header.html">
+      <Filter>site</Filter>
+    </None>
+    <None Include="site\opensync_index.html">
+      <Filter>site</Filter>
+    </None>
+    <None Include="site\opensync_login.html">
+      <Filter>site</Filter>
+    </None>
   </ItemGroup>
 </Project>
