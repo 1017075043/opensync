@@ -30,6 +30,7 @@
 using namespace std;
 opensync::log4cpp_instance* out = opensync::log4cpp_instance::init_instance();
 
+
 #include "crow.h"
 #define CROW_LOG_CRITICAL out->logs << OUTCRIT
 #define CROW_LOG_ERROR out->logs << OUTERROR
