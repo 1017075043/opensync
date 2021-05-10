@@ -139,14 +139,14 @@ namespace opensync
 		{
 			return true;
 		}
-		if (file_op.get_file_status(file_path) == false) //如果文件不存在
+		if (file_op->get_file_status(file_path) == false) //如果文件不存在
 		{
 			return false;
 		}
 		string dir_path = file_path;
-		if (file_op.get_file_type(dir_path) != 3) //如果文件不是目录
+		if (file_op->get_file_type(dir_path) != 3) //如果文件不是目录
 		{
-			dir_path = file_op.get_file_path(dir_path).parent_path().string();
+			dir_path = file_op->get_file_path(dir_path).parent_path().string();
 			out->logs << OUTDEBUG << file_path << " is file, get it parent_path=" << dir_path;
 		}
 		if (is_exists_inotifyed_file(file_path)) //是否已经处于监听状态
@@ -187,7 +187,7 @@ namespace opensync
 	bool file_system_listen::add_watch_dir(const string& dir_path)//向inotify中添加一个目录监控,会监控目录下（包括子目录）的所有动作（只监控目录）
 	{
 		vector<const opensync::file_attribute*> file_attr_list;
-		file_attr_list = file_op.get_file_and_dir_traverse_dir_list(dir_path);
+		file_attr_list = file_op->get_file_and_dir_traverse_dir_list(dir_path);
 		BOOST_FOREACH(const opensync::file_attribute * file_attr, file_attr_list)
 		{
 			if (add_watch_unit(file_attr->file_path.string()) == false)
@@ -324,7 +324,7 @@ namespace opensync
 			string file_path = parent_name + "/" + name;
 			inotify_add_event_into_event_list(file_path, mask);
 
-			//file_op.show_file_info(parent_name + "/" + name);
+			//file_op->show_file_info(parent_name + "/" + name);
 			if ((mask & IN_ISDIR) && ((mask & IN_CREATE) || (mask & IN_MOVED_TO)) && is_exists_inotifyed_file(file_path) == false) //如果新增加或者移入了一个目录，将其添加到监控列表
 			{
 				add_watch_unit(file_path);

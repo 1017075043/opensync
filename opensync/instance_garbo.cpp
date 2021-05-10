@@ -11,5 +11,6 @@ namespace opensync
 		opensync::user_group_info::destory();
 		opensync::file_info_databases::destory();
 		opensync::file_system_listen::destory();
+		opensync::file_system_operation::destory();
 	}
 }

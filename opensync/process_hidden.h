@@ -36,7 +36,7 @@ namespace opensync
 	private:
 		static process_hidden* instance;
 		opensync::log4cpp_instance* out = opensync::log4cpp_instance::init_instance();
-		opensync::file_system_operation file_op;
+		opensync::file_system_operation* file_op = opensync::file_system_operation::init_instance();
 		system_action sys_ac;
 
 		int fanotify_fd;

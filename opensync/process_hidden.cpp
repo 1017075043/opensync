@@ -208,7 +208,7 @@ namespace opensync
 		string file_path = file_path_temp;
 		try
 		{
-			if (file_op.get_file_status(file_path) == false) //如果文件不存在
+			if (file_op->get_file_status(file_path) == false) //如果文件不存在
 			{
 				throw exception() << err_str(file_path + " is not exists, mesg=" + strerror(errno));
 			}

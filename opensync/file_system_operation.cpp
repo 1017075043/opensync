@@ -3,11 +3,33 @@
 /*####################### file_system_operation #######################*/
 namespace opensync
 {
+	file_system_operation* file_system_operation::instance = nullptr;
 	file_system_operation::file_system_operation()
 	{
+
 	}
 	file_system_operation::~file_system_operation()
 	{
+
+	}
+	file_system_operation* file_system_operation::get_instance()
+	{
+		return instance;
+	}
+	file_system_operation* file_system_operation::init_instance()
+	{
+		if (instance == nullptr) {
+			instance = new file_system_operation();
+		}
+		return instance;
+	}
+	void file_system_operation::destory()
+	{
+		if (instance != nullptr)
+		{
+			delete instance;
+			instance = nullptr;
+		}
 	}
 	void file_system_operation::init_file_info(const string& file_path) //初始化文件信息
 	{
@@ -34,7 +56,7 @@ namespace opensync
 			//out->logs << OUTDEBUG << file_path << ", attribute.permissions=" << file_info->data[file_path].permissions;
 			file_info->data[file_path].permissions_name = file_info->transfrom_file_permissions((int)s.permissions());
 			//out->logs << OUTDEBUG << file_path << ", attribute.permissions_name=" << file_info->data[file_path].permissions_name;
-			file_info->data[file_path].last_write_time = boost::filesystem::last_write_time(p);
+			file_info->data[file_path].last_write_time = boost::filesystem::last_write_time(p) + 28800;
 			//out->logs << OUTDEBUG << file_path << ", attribute.last_write_time=" << file_info->data[file_path].last_write_time;
 			file_info->data[file_path].last_write_time_s = boost::posix_time::to_iso_extended_string(boost::posix_time::from_time_t(file_info->data[file_path].last_write_time));
 			//out->logs << OUTDEBUG << file_path << ", attribute.last_write_time_s=" << file_info->data[file_path].last_write_time_s;
@@ -141,6 +163,38 @@ namespace opensync
 			out->logs << OUTERROR << *boost::get_error_info<err_str>(e);
 		}
 		return md5_value;
+	}
+	const vector<const opensync::file_attribute*> file_system_operation::get_directory_file_list(const string& file_path) //遍历获取一个目录下所有类型文件的属性信息列表（单层)
+	{
+		typedef boost::filesystem::directory_iterator rd_iterator;
+		vector<const opensync::file_attribute*> file_and_son_info;
+		try
+		{
+			boost::filesystem::path p(file_path);
+			if (!exists(p))
+			{
+				throw exception() << err_str(file_path + " " + strerror(errno));
+			}
+			if (file_info->data.find(file_path) == file_info->data.end())
+			{
+				init_file_info(file_path);
+			}
+			//file_and_son_info.push_back(&file_info->data[file_path]);
+			if (boost::filesystem::is_directory(p))
+			{
+				rd_iterator end;
+				for (rd_iterator pos(p); pos != end; ++pos)
+				{
+					get_file_info((const string&)pos->path());
+					file_and_son_info.push_back(&file_info->data[(const string&)pos->path()]);
+				}
+			}
+		}
+		catch (exception& e)
+		{
+			out->logs << OUTERROR << *boost::get_error_info<err_str>(e);
+		}
+		return file_and_son_info;
 	}
 	const vector<const opensync::file_attribute*> file_system_operation::get_file_and_dir_traverse_all_list(const string& file_path)  //遍历获取一个目录或目录及其下级所有类型文件的属性信息列表
 	{

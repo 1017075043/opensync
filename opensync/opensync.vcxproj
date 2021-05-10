@@ -92,9 +92,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="opensync_log4cpp.conf" />
+    <None Include="site\opensync_file_system.html" />
     <None Include="site\opensync_header.html" />
     <None Include="site\opensync_index.html" />
     <None Include="site\opensync_login.html" />
+    <None Include="site\opensync_upload.html" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="exception.h" />

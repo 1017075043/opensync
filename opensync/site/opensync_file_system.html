@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>{{opensync_title}}</title>
+    <link rel="icon" href="favicon.ico" type="image/ico">
+    <meta name="keywords" content="{{opensync_title}}">
+    <meta name="description" content="{{opensync_title}}">
+    <meta name="author" content="yinqi">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/style.min.css" rel="stylesheet">
+</head>
+
+<script type="text/javascript">
+    window.onload = function() {
+    document.getElementById('opensync_file_system').className = 'active';
+    document.getElementById('UI_yuan_su').className = 'nav-item nav-item-has-subnav active open';
+    }
+</script>
+
+<body>
+    <div class="lyear-layout-web">
+        <div class="lyear-layout-container">
+
+            {{opensync_header}}
+
+            <!--页面主要内容-->
+            <main class="lyear-layout-content">
+
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>{{local_path}}</h4>
+                                    <a type="button" class="btn btn-w-sm btn-danger btn-round" data-toggle="modal" data-target="#myModal">上传</a>
+                                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
+                                        <form class="form-horizontal" action="opensync_upload.do?path={{upload_path}}" method="post" enctype="multipart/form-data">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                                        <h4 class="modal-title" id="myModalLabel">文件上传</h4>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <!--<div class="col-xs-11" style="margin-left:20px;margin-top:20px;">
+                                                            <input class="form-control" type="text" placeholder=".col-xs-11" value="{{local_path}}">
+                                                        </div>-->
+                                                        <div class="col-xs-12">
+                                                            <input type="file" style="margin-left:20px;margin-top:20px;" id="example-file-multiple-input" name="example-file-multiple-input" multiple>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                                        <button class="btn btn-primary" type="submit">提交</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <a class="btn btn-success btn-w-sm btn-round" href="?path={{parents_path}}">返回上一级</a>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>文件名</th>
+                                                <th>权限</th>
+                                                <th>用户</th>
+                                                <th>用户组</th>
+                                                <th>大小</th>
+                                                <th>最后修改时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{file_context}}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+            <!--End 页面主要内容-->
+        </div>
+    </div>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="js/main.min.js"></script>
+</body>
+</html>

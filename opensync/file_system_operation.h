@@ -18,16 +18,17 @@
 #include "string_operation.h"
 
 /*
-	文件系统操作类
+	文件系统操作类(单例)
 	@author 吴南辉
 	@time 2020/05/30
 */
 
 namespace opensync
 {
-	class file_system_operation
+	class file_system_operation : boost::noncopyable
 	{
 	private:
+		static file_system_operation* instance;
 		opensync::log4cpp_instance* out = opensync::log4cpp_instance::init_instance();
 		opensync::user_group_info* user_group = opensync::user_group_info::init_instance();
 		opensync::file_info_databases* file_info = opensync::file_info_databases::init_instance();
@@ -42,13 +43,22 @@ namespace opensync
 
 		//file_system_operation_show
 		void show_file_info_p(const string& file_path); //显示文件的属性（私用）
-	public:
+
+	private:
 		//file_system_operation
 		file_system_operation();
 		~file_system_operation();
 
+	public:
+		//file_system_operation
+		static file_system_operation* get_instance();
+		static file_system_operation* init_instance();
+		static void destory();
+
+	public:
 		//file_system_operation_get
 		const opensync::file_attribute* get_file_info(const string& file_path); //获取一个文件属性信息
+		const vector<const opensync::file_attribute*> get_directory_file_list(const string& file_path); //遍历获取一个目录下所有类型文件的属性信息列表（单层)
 		const vector<const opensync::file_attribute*> get_file_and_dir_traverse_all_list(const string& file_path); //遍历获取一个目录或目录及其下级所有类型文件的属性信息列表
 		const vector<const opensync::file_attribute*> get_file_and_dir_traverse_dir_list(const string& file_path); //遍历获取一个目录或目录及其下级目录类型文件的属性信息列表
 		const vector<const opensync::file_attribute*> get_file_and_dir_traverse_file_list(const string& file_path);//遍历获取一个目录或目录及其下级非目录类型文件的属性信息列表
