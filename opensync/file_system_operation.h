@@ -108,6 +108,9 @@ namespace opensync
 		bool set_file_group(const string& file_path, const string& group_name);//设置文件file_group_name
 		bool set_file_user_group(const string& file_path, const int& user, const int& group);//设置文件file_user和file_user_name
 		bool set_file_user_group(const string& file_path, const string& user_name, const string& group_name);//设置文件file_user_name和file_user_name
+
+		//file_system_operation_act
+		bool act_delete_file(const string& file_path);//删除一个文件
 	};
 }
 

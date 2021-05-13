@@ -75,7 +75,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\file\public_database\boost_1_69_0;D:\file\public_database\c++ 4.8.2;D:\file\public_database\include;D:\file\public_database\x86_64-redhat-linux_4.8.2;D:\file\public_database\x86_64-redhat-linux;D:\file\public_database\log4cplus;D:\file\public_database\log4cpp;D:\file\public_database\openssl;D:\file\public_database\crow</IncludePath>
+    <IncludePath>D:\file\public_database\boost_1_69_0;D:\file\public_database\c++ 4.8.2;D:\file\public_database\include;D:\file\public_database\x86_64-redhat-linux_4.8.2;D:\file\public_database\x86_64-redhat-linux;D:\file\public_database\log4cplus;D:\file\public_database\log4cpp;D:\file\public_database\openssl;D:\file\public_database\crow;D:\file\public_database\json</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="exception.cpp" />
@@ -96,7 +96,6 @@
     <None Include="site\opensync_header.html" />
     <None Include="site\opensync_index.html" />
     <None Include="site\opensync_login.html" />
-    <None Include="site\opensync_upload.html" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="exception.h" />
@@ -114,7 +113,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <LibraryDependencies>log4cpp;boost_date_time;boost_filesystem;boost_program_options;boost_regex;boost_system;boost_prg_exec_monitor;boost_unit_test_framework;boost_thread;pthread;crypto</LibraryDependencies>
+      <LibraryDependencies>log4cpp;boost_date_time;boost_filesystem;boost_program_options;boost_regex;boost_system;boost_prg_exec_monitor;boost_unit_test_framework;boost_thread;pthread;crypto;json</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

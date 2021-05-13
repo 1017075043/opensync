@@ -1028,3 +1028,25 @@ namespace opensync
 		return file_info->data[file_path].status;
 	}
 }
+
+/*####################### file_system_operation #######################*/
+namespace opensync
+{
+	bool file_system_operation::act_delete_file(const string& file_path) //删除一个文件
+	{
+		try
+		{
+			if (boost::filesystem::remove(file_path) == false)
+			{
+				throw exception() << err_str(file_path + " " + strerror(errno));
+			}
+			file_info->data.erase(file_path);
+			return true;
+		}
+		catch (exception& e)
+		{
+			out->logs << OUTERROR << *boost::get_error_info<err_str>(e);
+		}
+		return false;
+	}
+}

@@ -104,7 +104,7 @@ namespace opensync
 			return it->second;
 		}
 		out->logs << OUTWARN << id << " is not exist";
-		return "";
+		return std::to_string(id);
 	}
 	int user_group_info::get_user_id(const string& name) //获取用户ID
 	{
@@ -128,7 +128,7 @@ namespace opensync
 			return it->second;
 		}
 		out->logs << OUTWARN << id << " is not exist";
-		return "";
+		return std::to_string(id);
 	}
 	int user_group_info::get_group_id(const string& name) //获取用户组ID
 	{

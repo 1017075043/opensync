@@ -123,9 +123,6 @@
     <None Include="site\opensync_login.html">
       <Filter>site</Filter>
     </None>
-    <None Include="site\opensync_upload.html">
-      <Filter>site</Filter>
-    </None>
     <None Include="site\opensync_file_system.html">
       <Filter>site</Filter>
     </None>

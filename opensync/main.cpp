@@ -33,6 +33,7 @@ opensync::file_system_operation* file_op = opensync::file_system_operation::init
 
 
 #include "crow.h"
+#include "json/json.h"
 #define CROW_LOG_CRITICAL out->logs << OUTCRIT
 #define CROW_LOG_ERROR out->logs << OUTERROR
 #define CROW_LOG_WARNING out->logs << OUTWARN
@@ -50,39 +51,18 @@ void opensync_crow_include(crow::mustache::context& ctx, const std::string& file
 //判断是否登录
 bool opensync_crow_check_login(const crow::request& req, crow::response& res);
 //文件上传
-bool opensync_crow_upload(const std::string& path, const std::string& data);
+bool opensync_crow_upload(const std::string& path, const std::string& data, std::map<std::string, int>& upload_result);
 
 crow::App<crow::CookieParser> opensync_crow_app;
 std::string opensync_crow_cookie_user_id;
 
 int main(int argc, char* argv[])
 {
-	//vector<const opensync::file_attribute*> file_attr_list;
-	//file_attr_list = file_op->get_directory_file_list("/tmp");
-	//out->logs << OUTDEBUG << file_attr_list.size();
-	//BOOST_FOREACH(const opensync::file_attribute * file_attr, file_attr_list)
-	//{
-	//	out->logs << OUTDEBUG << "file_hash=" << file_attr->file_hash;
-	//	out->logs << OUTDEBUG << "file_name=" << file_attr->file_path.filename().c_str();
-	//	out->logs << OUTDEBUG << "file_path=" << file_attr->file_path.c_str();
-	//	out->logs << OUTDEBUG << "file_size=" << file_attr->file_size;
-	//	out->logs << OUTDEBUG << "group=" << file_attr->group;
-	//	out->logs << OUTDEBUG << "group_name=" << file_attr->group_name;
-	//	out->logs << OUTDEBUG << "last_write_time=" << file_attr->last_write_time;
-	//	out->logs << OUTDEBUG << "last_write_time_s=" << file_attr->last_write_time_s;
-	//	out->logs << OUTDEBUG << "permissions=" << file_attr->permissions;
-	//	out->logs << OUTDEBUG << "permissions_name=" << file_attr->permissions_name;
-	//	out->logs << OUTDEBUG << "status=" << file_attr->status;
-	//	out->logs << OUTDEBUG << "type=" << file_attr->type;
-	//	out->logs << OUTDEBUG << "type_name=" << file_attr->type_name;
-	//	out->logs << OUTDEBUG << "user=" << file_attr->user;
-	//	out->logs << OUTDEBUG << "user_name=" << file_attr->user_name;
-	//	out->logs << OUTDEBUG << "---------------------------------------------------------------";
-	//}
 	opensync_crow_start();
 }
 
 #define OPENSYNC_SITE "/home/wnh/projects/opensync/site/"
+//启动crow http框架
 void opensync_crow_start()
 {
 	crow::mustache::set_base(OPENSYNC_SITE);
@@ -158,23 +138,22 @@ void opensync_crow_start()
 			out->logs << OUTDEBUG << "upload_path=" << upload_path;
 			out->logs << OUTDEBUG << "Content-Length=" << req.get_header_value("Content-Length");
 			res.set_header("Content-Type", "text/html");
-			opensync_crow_upload(upload_path + "/", req.body);
+			std::map<std::string, int> upload_result;
+			opensync_crow_upload(upload_path + "/", req.body, upload_result);
+			std::map<std::string, int>::iterator it;
+			it = upload_result.begin();
+			Json::Value result;
+			while (it != upload_result.end())
+			{
+				Json::Value file_result;
 
-			res.write("{update_result:1}");
-			res.end();
-		}
-		});
-	//文件上传,需要登录
-	CROW_ROUTE(opensync_crow_app, "/site/opensync_upload.html")
-		.methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)([](const crow::request& req, crow::response& res) {
-		if (opensync_crow_check_login(req, res)) //判断是否已经登录
-		{
-			res.set_header("Content-Type", "text/html");
-			crow::mustache::context ctx;
-			opensync_crow_include(ctx, "opensync_header.html", "opensync_header");
-			ctx["opensync_title"] = "文件上传 - opensync";
-			auto text = crow::mustache::load("opensync_upload.html").render(ctx);
-			res.write(text);
+				file_result["filename"] = it->first;
+				file_result["result"] = it->second;
+				//out->logs << OUTINFO << it->first << "=" << it->second;
+				result["info"].append(file_result);
+				it++;
+			}
+			res.write(result.toStyledString());
 			res.end();
 		}
 		});
@@ -187,17 +166,19 @@ void opensync_crow_start()
 			crow::mustache::context ctx;
 			opensync_crow_include(ctx, "opensync_header.html", "opensync_header");
 			ctx["opensync_title"] = "文件系统 - opensync";
+			auto text = crow::mustache::load("opensync_file_system.html").render(ctx);
+			res.write(text);
+			res.end();
+		}
+		});
+	//目录资源接口,需要登录
+	CROW_ROUTE(opensync_crow_app, "/site/opensync_dir_info.do")
+		.methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)([](const crow::request& req, crow::response& res) {
+		if (opensync_crow_check_login(req, res)) //判断是否已经登录
+		{
+			res.set_header("Content-Type", "text/html");
 			//从get请求的path参数中获取访问的目录路径
 			std::string local_path = req.url_params.get("path") != nullptr && req.url_params.get("path") != NULL ? req.url_params.get("path") : "/home";
-			ctx["local_path"] = local_path;
-			out->logs << OUTINFO << "path=" << local_path;
-
-			ctx["upload_path"] = opensync::string_operation::url_encode(local_path);
-			//从目录路径中上一级的路径
-			out->logs << OUTDEBUG << "local_path.rfind(\" / \")=" << local_path.rfind("/");
-			ctx["parents_path"] = opensync::string_operation::url_encode(
-				local_path.rfind("/") != string::npos && local_path.rfind("/") != 0 ? local_path.substr(0, local_path.rfind("/")) : "/"
-			);
 
 			//获取目录内容，构建html代码
 			vector<const opensync::file_attribute*> file_attr_list;
@@ -205,57 +186,45 @@ void opensync_crow_start()
 			out->logs << OUTDEBUG << file_attr_list.size();
 			int i = 0;
 			std::string file_context;
-			BOOST_FOREACH(const opensync::file_attribute * file_attr, file_attr_list)
+			Json::Value file_info_list;
+			file_info_list["path"] = local_path;
+			file_info_list["parents_path"] = local_path.rfind("/") != string::npos && local_path.rfind("/") != 0 ? local_path.substr(0, local_path.rfind("/")) : "/";
+			BOOST_FOREACH(const opensync::file_attribute* file_attr, file_attr_list)
 			{
-				file_context = file_context + "<tr>";
-				file_context = file_context + "<th scope = \"row\">" + std::to_string(++i) + "</th>";
-				if (boost::filesystem::is_directory(file_attr->file_path))
+				if (boost::filesystem::is_directory(file_attr->file_path) == true) 
 				{
-					file_context = file_context + "<td><a href=\"?path=" +
-						opensync::string_operation::url_encode(file_attr->file_path.c_str()) + "\">" + 
-						file_attr->file_path.filename().c_str() + "</a></td>";
+					Json::Value file_attribute;
+					file_attribute["num"] = Json::Value(++i);
+					file_attribute["filename"] = Json::Value(file_attr->file_path.filename().c_str());
+					file_attribute["permissions"] = Json::Value(file_attr->permissions_name);
+					file_attribute["user"] = Json::Value(file_attr->user_name);
+					file_attribute["group"] = Json::Value(file_attr->group_name);
+					file_attribute["size"] = Json::Value(std::to_string(file_attr->file_size));
+					file_attribute["last_write_time"] = Json::Value(file_attr->last_write_time_s);
+					file_attribute["type"] = Json::Value("dir");
+					file_info_list["info"].append(file_attribute);
 				}
-				else
-				{
-					file_context = file_context + "<td>" + file_attr->file_path.filename().c_str() +  "</td>";
-				}
-				file_context = file_context + "<td>" + file_attr->permissions_name + "</td>";
-				file_context = file_context + "<td>" + file_attr->user_name + "</td>";
-				file_context = file_context + "<td>" + file_attr->group_name + "</td>";
-				if (boost::filesystem::is_directory(file_attr->file_path))
-				{
-					file_context = file_context + "<td></td>";
-				}
-				else
-				{
-					if (file_attr->file_size < 1024)
-					{
-						file_context = file_context + "<td>" + std::to_string(file_attr->file_size) + "B</td>";
-					}
-					else if (file_attr->file_size < 1024 * 1024)
-					{
-						file_context = file_context + "<td>" + std::to_string(file_attr->file_size / 1024) + "KB</td>";
-					}
-					else if (file_attr->file_size >= 1024 * 1024)
-					{
-						file_context = file_context + "<td>" + std::to_string(file_attr->file_size / 1024 / 1024) + "M</td>";
-					}
-				}
-				file_context = file_context + "<td>" + file_attr->last_write_time_s + "</td>";
-				file_context = file_context + "<td>";
-				file_context = file_context + "<a class=\"btn btn-xs btn-primary btn-round\">修改</a>";
-				file_context = file_context + "<a class=\"btn btn-xs btn-dark btn-round\">删除</a>";
-				if (!boost::filesystem::is_directory(file_attr->file_path))
-				{
-					file_context = file_context + "<a class=\"btn btn-xs btn-default btn-round\" href=\"opensync_download.do?file=" +
-						opensync::string_operation::url_encode(file_attr->file_path.c_str()) + "\" download=\"" +
-						file_attr->file_path.filename().c_str() + "\">下载</a>";
-				}
-				file_context = file_context + "</td></tr>";
 			}
-			ctx["file_context"] = file_context;
-			auto text = crow::mustache::load("opensync_file_system.html").render(ctx);
-			res.write(text);
+			BOOST_FOREACH(const opensync::file_attribute* file_attr, file_attr_list)
+			{
+				if (boost::filesystem::is_directory(file_attr->file_path) == false)
+				{
+					Json::Value file_attribute;
+					file_attribute["num"] = Json::Value(++i);
+					file_attribute["filename"] = Json::Value(file_attr->file_path.filename().c_str());
+					file_attribute["permissions"] = Json::Value(file_attr->permissions_name);
+					file_attribute["user"] = Json::Value(file_attr->user_name);
+					file_attribute["group"] = Json::Value(file_attr->group_name);
+					file_attribute["size"] = Json::Value(std::to_string(file_attr->file_size));
+					file_attribute["last_write_time"] = Json::Value(file_attr->last_write_time_s);
+					file_attribute["type"] = Json::Value("file");
+					file_info_list["info"].append(file_attribute);
+				}
+			}
+			file_info_list["count"] = i;
+			//out->logs << OUTINFO << file_info_list.toStyledString();
+			out->logs << OUTINFO << "目录资源, 目录=" << local_path;
+			res.write(file_info_list.toStyledString());
 			res.end();
 		}
 		});
@@ -266,7 +235,7 @@ void opensync_crow_start()
 		{
 			//out->logs << OUTDEBUG << "Content-Length=" << req.get_header_value("Content-Length");
 			res.set_header("Content-Type", "text/html");
-			//从get请求的path参数中获取要下载文件的路径
+			//从get请求的file参数中获取要下载文件的路径
 			std::string download_file = req.url_params.get("file") != nullptr && req.url_params.get("file") != NULL ? req.url_params.get("file") : "";
 			if (download_file.empty())
 			{
@@ -295,7 +264,33 @@ void opensync_crow_start()
 			}
 		}
 		});
-
+	//文件删除接口,需要登录
+	CROW_ROUTE(opensync_crow_app, "/site/opensync_delete.do")
+		.methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)([](const crow::request& req, crow::response& res) {
+		//out->logs << OUTDEBUG << "Content-Length=" << req.get_header_value("Content-Length");
+		res.set_header("Content-Type", "text/html");
+		//从get请求的file参数中获取要下载文件的路径
+		std::string delete_file = req.url_params.get("file") != nullptr && req.url_params.get("file") != NULL ? req.url_params.get("file") : "";
+		if (delete_file.empty())
+		{
+			res.code = 503;
+			res.write("Not found");
+			res.end();
+		}
+		Json::Value result;
+		if (file_op->act_delete_file(delete_file))
+		{
+			out->logs << OUTINFO << "删除文件，文件=" << delete_file;
+			result["result"] = 1;
+		}
+		else 
+		{
+			out->logs << OUTWARN << "删除文件失败，文件=" << delete_file;
+			result["result"] = 0;
+		}
+		res.write(result.toStyledString());
+		res.end();
+		});
 	//访问css资源,无需登录
 	CROW_ROUTE(opensync_crow_app, "/site/css/<string>")
 		.methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)([](const crow::request& req, crow::response& res, std::string filename) {
@@ -397,7 +392,7 @@ void opensync_crow_include(crow::mustache::context& ctx, const std::string& file
 	}
 }
 //判断是否登录
-bool opensync_crow_check_login(const crow::request& req, crow::response& res) 
+bool opensync_crow_check_login(const crow::request& req, crow::response& res)
 {
 	auto& cookie_ctx = opensync_crow_app.get_context<crow::CookieParser>(req);
 	std::string user_id = cookie_ctx.get_cookie("user_id");
@@ -413,7 +408,7 @@ bool opensync_crow_check_login(const crow::request& req, crow::response& res)
 	return true;
 }
 //文件上传
-bool opensync_crow_upload(const std::string& path, const std::string& data)
+bool opensync_crow_upload(const std::string& path, const std::string& data, std::map<std::string, int>& upload_result)
 {
 	std::string boundary = data.substr(0, data.find("\n"));
 	std::string other = data.substr(boundary.length() + 1);
@@ -437,7 +432,8 @@ bool opensync_crow_upload(const std::string& path, const std::string& data)
 	out->logs << OUTDEBUG << content_type;
 
 	std::string filename = content_disposition.substr(content_disposition.find("filename") + 10);
-	filename = path + filename.substr(0, filename.length() - 2);
+	std::string filename_s = filename.substr(0, filename.length() - 2);
+	filename = path + filename_s;
 	out->logs << OUTDEBUG << "filename=" << filename;
 
 	file1 = file1.substr(file1.find("\n") + 3);
@@ -451,10 +447,12 @@ bool opensync_crow_upload(const std::string& path, const std::string& data)
 			{
 				fout << file1;
 				fout.close();
+				upload_result[filename_s] = 1;
 				out->logs << OUTINFO << "上传成功，保存路径=" << filename;
 			}
 			else
 			{
+				upload_result[filename_s] = 0;
 				throw opensync::exception() << opensync::err_str("保存异常 " + filename + ", mesg=" + strerror(errno));
 			}
 		}
@@ -463,19 +461,102 @@ bool opensync_crow_upload(const std::string& path, const std::string& data)
 			out->logs << OUTERROR << *boost::get_error_info<opensync::err_str>(e);
 		}
 	}
-	
+
 	if (other.find(boundary) != string::npos)
 	{
 		other = other.substr(other.find(boundary));
-		opensync_crow_upload(path, other);
+		opensync_crow_upload(path, other, upload_result);
 	}
 	return true;
 }
 
 
 /*
+#include <iostream>
+#include <string>
+#include "json/json.h"   
+using namespace std;
+int main() {
+	Json::Value json_temp;
+	json_temp["name"] = Json::Value("sharexu");
+	json_temp["age"] = Json::Value(18);
+	Json::Value json_temp1;
+	json_temp1["name"] = Json::Value("sharexu");
+	json_temp1["age"] = Json::Value(18);
+	json_temp["wnh"].append(json_temp1);
+	json_temp["wnh"].append(json_temp1);
+	json_temp["wnh"].append(json_temp1);
+	cout << json_temp["name"].asString() << endl;
+	cout << json_temp.toStyledString() << endl;
+	//Json::Value root;
+	//root["key_string"] = Json::Value("value_string");
+	//root["key_number"] = Json::Value(12345);
+	//root["key_boolean"] = Json::Value(false);
+	//root["key_double"] = Json::Value(12.345);
+	//root["key_object"] = json_temp;
+	//root["key_array"].append("array_string");
+	//root["key_array"].append(1234);
+	//
+	//Json::FastWriter fast_writer;
+	//std::cout << fast_writer.write(root);
+	//
+	//Json::StyledWriter styled_writer;
+	//std::cout << styled_writer.write(root);
+	//
+	//string str_test = "{\"id\":1,\"name\":\"pacozhong\"}";
+	//Json::Reader reader;
+	//Json::Value value;
+	//if (!reader.parse(str_test, value))
+	//	return 0;
+	//string value_name = value["name"].asString();
+	//cout << value_name << endl;
+	//cout << value["name"];
+	//if (!value["id"].isInt()) {
+	//	cout << "id is not int" << endl;
+	//}
+	//else {
+	//	int value_id = value["id"].asInt();
+	//	cout << value_id << endl;
+	//}
+	return 0;
+}
+*/
+/*
+要安装jsoncpp,首先要下载好scons,再去安装jsoncpp
+scons下载地址：wget http://prdownloads.sourceforge.NET/scons/scons-2.2.0.tar.gz
+Jsoncpp 下载地址 http://sourceforge.net/projects/jsoncpp/files/latest/download?_test=goal
+ 以上的下载地址未用过，但是下面的命令确实可以实现JsonCPP安装成功（下面命令都是小写，不知道为什么提交后部分变成大写）
+安装步骤如下：
+#tar -zxvf scons-2.1.0.tar.gz #cd scons-2.1.0
+#python setup.py install
+#tar -zxvf jsoncpp-src-0.5.0.tar.gz
+#cd jsoncpp-src-0.5.0
+#scons platform=linux-gcc
+//这里操作的动态库文件（.so）
+#mv libs/linux-gcc-4.4.7/libjson_linux-gcc-4.4.7_libmt.so  /lib
+#ln /lib/libjson_linux-gcc-4.4.7_libmt.so   /lib/libjson.so
+#mv include/json/ /usr/include/
+#ldconfig
+#./bin/linux-gcc-4.4.7/test_lib_json
+【注意这里的版本号可能不同】先通过cd libs进入libs目录，再用“ls”命令查看自己的版本号，然后在上述步骤中修改成自己的版本号即可
+Testing ValueTest/size: OK
+Testing ValueTest/isObject: OK
+Testing ValueTest/isArray: OK
+Testing ValueTest/isBool: OK
+Testing ValueTest/isInt: OK
+Testing ValueTest/isUInt: OK
+Testing ValueTest/isDouble: OK
+Testing ValueTest/isString: OK
+Testing ValueTest/isNull: OK
+All 9 tests passed
+上面操作动态库文件的命令行其实也可对静态库进行操作(当前目录jsoncpp-src-0.5.0)
+#mv libs/linux-gcc-4.4.7/libjson_linux-gcc-4.47_libmt.a  /usr/local/lib
+#ln  /usr/local/lib/libjson_linux-gcc-4.47_libmt.a   /usr/local/lib/libjson.a
+ 如果只对静态库转移的话，那.bin/linux-gcc-4.4.7/test_lib_json会报错
+*/
+/*
 静态链接参数
- g++ -o "/home/wnh/projects/opensync/bin/x64/Debug/opensync.out" -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-Bstatic /home/wnh/projects/opensync/obj/x64/Debug/exception.o /home/wnh/projects/opensync/obj/x64/Debug/file_info_databases.o /home/wnh/projects/opensync/obj/x64/Debug/file_system_listen.o /home/wnh/projects/opensync/obj/x64/Debug/file_system_operation.o /home/wnh/projects/opensync/obj/x64/Debug/instance_garbo.o /home/wnh/projects/opensync/obj/x64/Debug/log4cpp_instance.o /home/wnh/projects/opensync/obj/x64/Debug/main.o /home/wnh/projects/opensync/obj/x64/Debug/process_hidden.o /home/wnh/projects/opensync/obj/x64/Debug/string_operation.o /home/wnh/projects/opensync/obj/x64/Debug/system_action.o /home/wnh/projects/opensync/obj/x64/Debug/user_group_info.o -llog4cpp -lboost_date_time -lboost_filesystem -lboost_program_options -lboost_regex -lboost_system -lboost_prg_exec_monitor -lboost_unit_test_framework -lboost_thread -lcrypto -Wl,-Bdynamic  -Wl,--as-needed -lpthread
+g++ -o "/home/wnh/projects/opensync/bin/x64/Debug/opensync.out" -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-Bstatic /home/wnh/projects/opensync/obj/x64/Debug/exception.o /home/wnh/projects/opensync/obj/x64/Debug/file_info_databases.o /home/wnh/projects/opensync/obj/x64/Debug/file_system_listen.o /home/wnh/projects/opensync/obj/x64/Debug/file_system_operation.o /home/wnh/projects/opensync/obj/x64/Debug/instance_garbo.o /home/wnh/projects/opensync/obj/x64/Debug/log4cpp_instance.o /home/wnh/projects/opensync/obj/x64/Debug/main.o /home/wnh/projects/opensync/obj/x64/Debug/process_hidden.o /home/wnh/projects/opensync/obj/x64/Debug/string_operation.o /home/wnh/projects/opensync/obj/x64/Debug/system_action.o /home/wnh/projects/opensync/obj/x64/Debug/user_group_info.o -llog4cpp -lboost_date_time -lboost_filesystem -lboost_program_options -lboost_regex -lboost_system -lboost_prg_exec_monitor -lboost_unit_test_framework -lboost_thread -ljson -lcrypto -Wl,-Bdynamic  -Wl,--as-needed -lpthread
 int main(int argc, char* argv[])
 {
 	cout << "opensync start" << endl;

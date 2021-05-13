@@ -13,13 +13,6 @@
     <link href="css/style.min.css" rel="stylesheet">
 </head>
 
-<script type="text/javascript">
-    window.onload = function() {
-    document.getElementById('opensync_file_system').className = 'active';
-    document.getElementById('UI_yuan_su').className = 'nav-item nav-item-has-subnav active open';
-    }
-</script>
-
 <body>
     <div class="lyear-layout-web">
         <div class="lyear-layout-container">
@@ -35,10 +28,11 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>{{local_path}}</h4>
-                                    <a type="button" class="btn btn-w-sm btn-danger btn-round" data-toggle="modal" data-target="#myModal">上传</a>
+                                    <h4 id="local_path"></h4>
+                                    <span style="float:right;" id="parents_path"></span>
+                                    <span style="float:right;"><a type="button" class="btn btn-w-sm btn-danger btn-round" data-toggle="modal" data-target="#myModal">上传</a></span>
                                     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
-                                        <form class="form-horizontal" action="opensync_upload.do?path={{upload_path}}" method="post" enctype="multipart/form-data">
+                                        <form id="uploadForm" class="form-horizontal" method="post" enctype="multipart/form-data" onsubmit="return uploadFile()">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -46,22 +40,19 @@
                                                         <h4 class="modal-title" id="myModalLabel">文件上传</h4>
                                                     </div>
                                                     <div class="form-group">
-                                                        <!--<div class="col-xs-11" style="margin-left:20px;margin-top:20px;">
-                                                            <input class="form-control" type="text" placeholder=".col-xs-11" value="{{local_path}}">
-                                                        </div>-->
                                                         <div class="col-xs-12">
-                                                            <input type="file" style="margin-left:20px;margin-top:20px;" id="example-file-multiple-input" name="example-file-multiple-input" multiple>
+                                                            <input id="uploadFileForm" type="file" style="margin-left:20px;margin-top:20px;" id="example-file-multiple-input" name="example-file-multiple-input" multiple>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                                                         <button class="btn btn-primary" type="submit">提交</button>
                                                     </div>
+                                                    <div id="update_result"></div>
                                                 </div>
                                             </div>
                                         </form>
                                     </div>
-                                    <a class="btn btn-success btn-w-sm btn-round" href="?path={{parents_path}}">返回上一级</a>
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-hover">
@@ -77,8 +68,7 @@
                                                 <th>操作</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            {{file_context}}
+                                        <tbody id="file_context">
                                         </tbody>
                                     </table>
 
@@ -100,3 +90,119 @@
     <script type="text/javascript" src="js/main.min.js"></script>
 </body>
 </html>
+
+<script type="text/javascript">
+var upload_path;
+function getData(path) {
+	$.ajax({
+		type: "GET",
+		url: "opensync_dir_info.do?path=" + encodeURIComponent(path),
+		dataType: "json",
+		success: function(res) {
+            //console.log(res);
+            upload_path = res.path;
+            $("#local_path").html(res.path); 
+            $("#parents_path").html("<a class=\"btn btn-success btn-w-sm btn-round\" href=\"javascript:void(0);\" onclick=\"getData('" + res.parents_path + "')\">返回上一级</a>");
+            var file_context = "";
+            if(res.info && res.info instanceof Array) {
+                res.info.forEach(info => {
+                    file_context += "<tr>"; 
+                    file_context += "<th scope = \"row\">" + info.num + "</th>";
+                    if(info.type == "file"){
+                        file_context += "<td><a style=\"color:#48b0f7;\" href=\"opensync_download.do?file=" + encodeURIComponent(res.path + "/" + info.filename) + "\" download=\"" + info.filename + "\">" + info.filename + "</a></td>";
+                    } else if(res.path == "/"){
+                        file_context += "<td><a href=\"javascript:void(0);\" onclick=\"getData('" + res.path + info.filename + "')\">" + info.filename + "</a></td>";
+                    } else {
+                        file_context += "<td><a href=\"javascript:void(0);\" onclick=\"getData('" + res.path + "/" + info.filename + "')\">" + info.filename + "</a></td>";
+                    }
+                    file_context += "<td>" + info.permissions + "</td>";
+                    file_context += "<td>" + info.user + "</td>";
+                    file_context += "<td>" + info.group + "</td>";
+                    if(info.type == "dir"){
+                        file_context += "<td></td>";
+                    } else if(info.size < 1024){
+                        file_context += "<td>" + info.size + "B</td>";
+                    } else if(info.size < 1024*1024){
+                        file_context += "<td>" + Math.ceil(info.size/1024) + "KB</td>";
+                    } else {
+                        file_context += "<td>" + Math.ceil(info.size/1024/1024) + "M</td>";
+                    }
+                    file_context += "<td>" + info.last_write_time + "</td>";
+                    file_context += "<td>";
+                    file_context += "<a class=\"btn btn-xs btn-primary btn-round\">修改</a>";
+                    file_context += "<a class=\"btn btn-xs btn-dark btn-round\" href=\"javascript:void(0);\" onclick=\"deleteFile('" + res.path + "/" + info.filename + "')\">删除</a>";
+                    file_context += "</td>";
+                    file_context += "</tr>";
+			    })
+            }
+            //console.log(file_context)
+            $("#file_context").html(file_context); 
+		}
+	})
+};
+function uploadFile() {
+    var formData = new FormData($('#uploadForm')[0])
+    var url = "opensync_upload.do?path=" + encodeURIComponent(upload_path);
+    console.log(url)
+    $.ajax({
+         url : url,
+         data: formData,
+         type : "POST",
+         // 告诉jQuery不要去处理发送的数据，用于对data参数进行序列化处理 这里必须false
+         processData : false,
+         // 告诉jQuery不要去设置Content-Type请求头
+         contentType : false,
+         dataType:"json",
+         success : function(res) {
+            //console.log('s',res);
+            $('#uploadFileForm').val('');
+            var file_context = "";
+            if(res.info && res.info instanceof Array) {
+                res.info.forEach(info => {
+                    if(info.result == 1){
+                        file_context += info.filename + "、";
+                    }
+                    console.log(info.filename, info.result); 
+			    })
+            }
+            if(file_context != ""){
+                var update_result = "<div class=\"alert alert-success alert-dismissible\" style=\"margin-bottom:0px;\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button>" + file_context + "<strong>上传成功</strong></div>";
+                $("#update_result").append(update_result); 
+            }
+            var file_context = "";
+            if(res.info && res.info instanceof Array) {
+                res.info.forEach(info => {
+                    if(info.result == 0){
+                        file_context += info.filename + "、";
+                    }
+                    console.log(info.filename, info.result); 
+			    })
+            }
+            if(file_context != ""){
+                var update_result = "<div class=\"alert alert-warning alert-dismissible\" style=\"margin-bottom:0px;\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">×</span></button>" + file_context + "<strong>上传成功</strong></div>";
+                $("#update_result").append(update_result); 
+            }
+            getData(upload_path); 
+         },
+         error : function(err) {
+            //console.log('e', err)   
+        }    
+    })
+    return false
+};
+function deleteFile(path) {
+	$.ajax({
+		type: "GET",
+		url: "opensync_delete.do?file=" + encodeURIComponent(path),
+		dataType: "json",
+		success: function(res) {
+            getData(upload_path); 
+		}
+	})
+};
+window.onload = function() {
+     document.getElementById('opensync_file_system').className = 'active';
+    document.getElementById('UI_yuan_su').className = 'nav-item nav-item-has-subnav active open';
+	getData("/home");
+};
+</script>
